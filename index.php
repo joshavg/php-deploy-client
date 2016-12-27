@@ -27,7 +27,7 @@ if ($key !== KEY) {
     $logger->error('remote ip check failed');
     $success = false;
 } else {
-    $logger->debug('changing to working directory ' . WORKING_DIR);
+    $logger->notice('changing to working directory ' . WORKING_DIR);
     chdir(WORKING_DIR);
 
     $git = new \joshavg\phpDeployClient\Git($logger);
