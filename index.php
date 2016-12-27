@@ -15,10 +15,17 @@ $logger->pushHandler($handler);
 $key = isset($_GET['key']) ? $_GET['key'] : null;
 $success = false;
 
+$remoteCheck = new \joshavg\phpDeployClient\RemoteIpCheck(ACCEPT_REMOTE_IP, $logger);
+
 if ($key !== KEY) {
     $logger->error('api keys do not match, provided: ' . $key);
+    $success = false;
 } elseif (WORKING_DIR === null) {
     $logger->error('working dir has not been configured');
+    $success = false;
+} elseif ($remoteCheck->run() === false) {
+    $logger->error('remote ip check failed');
+    $success = false;
 } else {
     $logger->debug('changing to working directory ' . WORKING_DIR);
     chdir(WORKING_DIR);

@@ -16,3 +16,8 @@ define('MAX_EXECUTION_TIME', 5 * 60);
  * will be the working directory of deploys
  */
 define('WORKING_DIR', null);
+
+/**
+ * sets remote ip address of host who is allowed to trigger deploys
+ */
+define('ACCEPT_REMOTE_IP', null);
