@@ -13,6 +13,7 @@ $handler = new \joshavg\phpDeployClient\LoggerHandler();
 $logger->pushHandler($handler);
 
 $key = isset($_GET['key']) ? $_GET['key'] : null;
+$success = false;
 
 if ($key !== KEY) {
     $logger->error('api keys do not match, provided: ' . $key);
@@ -26,7 +27,11 @@ if ($key !== KEY) {
     $composer = new \joshavg\phpDeployClient\Composer($logger);
 
     $process = new \joshavg\phpDeployClient\DeployProcess($git, $composer, $logger);
-    $process->run();
+    $success = $process->run();
+}
+
+if (!$success) {
+    http_response_code(500);
 }
 
 echo $handler->summarize();

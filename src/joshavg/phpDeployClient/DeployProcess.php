@@ -35,13 +35,16 @@ class DeployProcess
 
         if (!$checkout) {
             $this->logger->emergency('error while checkout, aborting');
-            return;
+            return false;
         }
 
         $install = $this->composer->install();
 
         if (!$install) {
             $this->logger->emergency('error while installing');
+            return false;
         }
+
+        return true;
     }
 }
