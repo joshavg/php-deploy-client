@@ -31,20 +31,7 @@ class DeployProcess
 
     public function run()
     {
-        $checkout = $this->git->checkout();
-
-        if (!$checkout) {
-            $this->logger->emergency('error while checkout, aborting');
-            return false;
-        }
-
-        $install = $this->composer->install();
-
-        if (!$install) {
-            $this->logger->emergency('error while installing');
-            return false;
-        }
-
-        return true;
+        $this->git->checkout();
+        $this->composer->install();
     }
 }

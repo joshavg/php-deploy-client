@@ -27,14 +27,12 @@ class Composer
         exec('composer install', $output, $ret);
 
         if ($ret !== 0) {
-            $this->logger->error('error while install, exit code: ' . $ret);
+            throw new DeployException('error while install, exit code: ' . $ret);
         }
 
         if (count($output)) {
             $this->logger->notice(implode("\n", $output));
         }
-
-        return $ret === 0;
     }
 
 }

@@ -29,16 +29,13 @@ class RemoteIpCheck
     public function run()
     {
         if ($this->allowed === null) {
-            return true;
+            return;
         }
 
         $remote = $_SERVER['REMOTE_ADDR'];
         if ($this->allowed !== $remote) {
-            $this->logger->error('remote ip not allowed: ' . $remote);
-            return false;
+            throw new DeployPreCheckException('remote ip not allowed: ' . $remote);
         }
-
-        return true;
     }
 
 }

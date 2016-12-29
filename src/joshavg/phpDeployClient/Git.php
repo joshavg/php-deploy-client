@@ -26,14 +26,12 @@ class Git
         exec('git checkout', $output, $ret);
 
         if ($ret !== 0) {
-            $this->logger->error('error while checkout, exit code: ' . $ret);
+            throw new DeployException('error while checkout, exit code: ' . $ret);
         }
 
         if (count($output)) {
             $this->logger->notice(implode("\n", $output));
         }
-
-        return $ret === 0;
     }
 
 }

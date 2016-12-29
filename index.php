@@ -1,5 +1,15 @@
 <?php
 
+
+use joshavg\phpDeployClient\Composer;
+use joshavg\phpDeployClient\DeployException;
+use joshavg\phpDeployClient\DeployPreCheckException;
+use joshavg\phpDeployClient\DeployProcess;
+use joshavg\phpDeployClient\Git;
+use joshavg\phpDeployClient\LoggerHandler;
+use joshavg\phpDeployClient\RemoteIpCheck;
+use Monolog\Logger;
+
 error_reporting(E_ALL);
 
 require_once __DIR__ . '/vendor/autoload.php';
@@ -7,37 +17,39 @@ require_once __DIR__ . '/settings.php';
 
 set_time_limit(MAX_EXECUTION_TIME);
 
-$logger = new \Monolog\Logger('main');
+$logger = new Logger('main');
 
-$handler = new \joshavg\phpDeployClient\LoggerHandler();
+$handler = new LoggerHandler();
 $logger->pushHandler($handler);
 
 $key = isset($_GET['key']) ? $_GET['key'] : null;
 $success = false;
 
-$remoteCheck = new \joshavg\phpDeployClient\RemoteIpCheck(ACCEPT_REMOTE_IP, $logger);
+try {
+    if (WORKING_DIR === null) {
+        throw new DeployPreCheckException('working dir has not been configured');
+    }
 
-if ($key !== KEY) {
-    $logger->error('api keys do not match, provided: ' . $key);
-    $success = false;
-} elseif (WORKING_DIR === null) {
-    $logger->error('working dir has not been configured');
-    $success = false;
-} elseif ($remoteCheck->run() === false) {
-    $logger->error('remote ip check failed');
-    $success = false;
-} else {
+    if ($key !== KEY) {
+        throw new DeployPreCheckException('api keys do not match, provided: ' . $key);
+    }
+
+    $remoteCheck = new RemoteIpCheck(ACCEPT_REMOTE_IP, $logger);
+    $remoteCheck->run();
+
     $logger->notice('changing to working directory ' . WORKING_DIR);
     chdir(WORKING_DIR);
 
-    $git = new \joshavg\phpDeployClient\Git($logger);
-    $composer = new \joshavg\phpDeployClient\Composer($logger);
+    $git = new Git($logger);
+    $composer = new Composer($logger);
 
-    $process = new \joshavg\phpDeployClient\DeployProcess($git, $composer, $logger);
+    $process = new DeployProcess($git, $composer, $logger);
     $success = $process->run();
-}
-
-if (!$success) {
+} catch (DeployPreCheckException $e) {
+    $logger->error($e->getMessage());
+    http_response_code(500);
+} catch (DeployException $e) {
+    $logger->emergency($e->getMessage());
     http_response_code(500);
 }
 
