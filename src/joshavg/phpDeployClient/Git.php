@@ -18,12 +18,12 @@ class Git
         $this->logger = $logger;
     }
 
-    public function checkout()
+    public function update()
     {
-        $this->logger->notice('executing "git checkout"');
+        $this->logger->notice('executing "git pull"');
         $ret = 0;
         $output = [];
-        exec('git checkout', $output, $ret);
+        exec('git pull', $output, $ret);
 
         if ($ret !== 0) {
             throw new DeployException('error while checkout, exit code: ' . $ret);

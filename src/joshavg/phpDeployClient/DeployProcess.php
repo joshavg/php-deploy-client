@@ -31,7 +31,7 @@ class DeployProcess
 
     public function run()
     {
-        $this->git->checkout();
+        $this->git->update();
         $this->composer->install();
     }
 }
